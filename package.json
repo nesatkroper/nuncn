@@ -1,0 +1,24 @@
+
+{
+  "name": "nuncn",
+  "version": "1.0.0",
+  "type": "module",
+  "bin": {
+    "nuncn": "./bin/cli.js"
+  },
+  "files": [
+    "bin"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "pub": "npm version patch && npm publish && git add . && git commit -m \"patch\" && git push"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "degit": "^2.8.4",
+    "fs-extra": "^11.2.0",
+    "ora": "^8.2.0",
+    "prompts": "^2.4.2"
+  }
+}
