@@ -22,12 +22,21 @@ export const tailwindcssSetup = async (spinner) => {
                 ? "pnpm"
                 : "npm";
 
-        execSync(`${packageManager} add -D tailwindcss@3 postcss autoprefixer`, {
-            stdio: "inherit",
-        });
+        try {
+            execSync(`${packageManager} add -D tailwindcss@3 postcss autoprefixer`, {
+                stdio: "inherit",
+            });
 
-        spinner.text = "Configuring Tailwind...";
-        execSync("npx tailwindcss init -p", { stdio: "inherit" });
+            spinner.text = "Configuring Tailwind...";
+            execSync("npx tailwindcss init -p", { stdio: "inherit" });
+        } catch (err) {
+            // More specific error handling
+            if (err.message.includes('command not found')) {
+                throw new Error(`Package manager (${packageManager}) not found. Make sure it's installed.`);
+            } else {
+                throw new Error(`Installation failed: ${err.message}`);
+            }
+        }
     } catch (err) {
         throw new Error(`Tailwind setup failed: ${err.message}`);
     }

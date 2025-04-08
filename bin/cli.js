@@ -31,11 +31,17 @@ const main = async () => {
         }
 
         await appComponentSetup(targetDir, spinner);
+        
+        // Add a small delay to ensure spinner updates are visible
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
         await tailwindcssSetup(spinner);
 
         spinner.succeed(chalk.green("Components installed successfully! 🎉"));
     } catch (err) {
-        spinner.fail(chalk.red(`Error: ${err.message}`));
+        spinner.stop(); // Stop spinner before showing error
+        console.error(chalk.red(`\nError: ${err.message}`));
+        console.error(chalk.gray(err.stack)); // Show stack trace in debug mode
         process.exit(1);
     }
 };
