@@ -8,10 +8,11 @@ import { tailwindcssSetup } from "./tailwindcss-setup.js";
 import { appComponentSetup } from "./app-component-setup.js";
 
 const main = async () => {
-    const spinner = ora("Setting up components...").start();
+    let spinner = ora("Setting up components...").start();
     const targetDir = "./src/components/app";
 
     try {
+        // Check if components exist
         if (fs.existsSync(targetDir)) {
             spinner.stop();
             const { overwrite } = await prompts({
@@ -22,30 +23,30 @@ const main = async () => {
             });
 
             if (!overwrite) {
-                console.log(
-                    chalk.yellow("Operation cancelled. No files were changed.")
-                );
+                console.log(chalk.yellow("Operation cancelled. No files were changed."));
                 process.exit(0);
             }
             spinner.start("Overwriting components...");
         }
 
+        // Download components
         await appComponentSetup(targetDir, spinner);
-        
-        // Add a small delay to ensure spinner updates are visible
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        await tailwindcssSetup(spinner);
 
+        // Stop spinner before showing Tailwind prompt
+        spinner.stop();
+
+        // Run Tailwind setup
+        await tailwindcssSetup();
+
+        // Show final success message
+        spinner = ora().start();
         spinner.succeed(chalk.green("Components installed successfully! 🎉"));
     } catch (err) {
-        spinner.stop(); // Stop spinner before showing error
+        spinner.stop();
         console.error(chalk.red(`\nError: ${err.message}`));
-        console.error(chalk.gray(err.stack)); // Show stack trace in debug mode
         process.exit(1);
     }
 };
 
 program.command("add").description("Install your components").action(main);
-
 program.parse(process.argv);

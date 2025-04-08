@@ -2,8 +2,11 @@ import { execSync } from "child_process";
 import fs from "fs-extra";
 import chalk from "chalk";
 import prompts from "prompts";
+import ora from "ora";
 
-export const tailwindcssSetup = async (spinner) => {
+export const tailwindcssSetup = async () => {
+    const spinner = ora();
+
     try {
         const { installTailwind } = await prompts({
             type: "confirm",
@@ -14,7 +17,7 @@ export const tailwindcssSetup = async (spinner) => {
 
         if (!installTailwind) return;
 
-        spinner.text = "Installing Tailwind CSS...";
+        spinner.start("Installing Tailwind CSS...");
 
         const packageManager = fs.existsSync("yarn.lock")
             ? "yarn"
@@ -22,22 +25,16 @@ export const tailwindcssSetup = async (spinner) => {
                 ? "pnpm"
                 : "npm";
 
-        try {
-            execSync(`${packageManager} add -D tailwindcss@3 postcss autoprefixer`, {
-                stdio: "inherit",
-            });
+        execSync(`${packageManager} add -D tailwindcss@3 postcss autoprefixer`, {
+            stdio: "inherit",
+        });
 
-            spinner.text = "Configuring Tailwind...";
-            execSync("npx tailwindcss init -p", { stdio: "inherit" });
-        } catch (err) {
-            // More specific error handling
-            if (err.message.includes('command not found')) {
-                throw new Error(`Package manager (${packageManager}) not found. Make sure it's installed.`);
-            } else {
-                throw new Error(`Installation failed: ${err.message}`);
-            }
-        }
+        spinner.text = "Configuring Tailwind...";
+        execSync("npx tailwindcss init -p", { stdio: "inherit" });
+
+        spinner.succeed("Tailwind CSS installed successfully!");
     } catch (err) {
+        spinner.fail("Tailwind CSS installation failed");
         throw new Error(`Tailwind setup failed: ${err.message}`);
     }
 };

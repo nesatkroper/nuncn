@@ -3,7 +3,7 @@
   "version": "1.0.2",
   "type": "module",
   "bin": {
-    "nuncn": "./bin/cli.js"
+    "nuncn": "./bin/main.js"
   },
   "files": [
     "bin"
